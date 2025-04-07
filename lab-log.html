@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Equipment Logger</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f4f6; padding: 20px; }
+    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h2 { text-align: center; }
+    label { display: block; margin: 10px 0 5px; }
+    select, button { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; }
+    button { background-color: #2563eb; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #1e40af; }
+    .log { text-align: center; font-size: 0.9em; color: green; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Lab Equipment Log</h2>
+    <label for="username">Name:</label>
+    <select id="username">
+      <option value="">--Select Name--</option>
+      <option>Alice</option>
+      <option>Bob</option>
+      <option>Charlie</option>
+    </select>
+
+    <label for="equipment">Equipment:</label>
+    <select id="equipment">
+      <option value="">--Select Equipment--</option>
+      <option>Microscope</option>
+      <option>3D Printer</option>
+      <option>Laser Cutter</option>
+    </select>
+
+    <button onclick="logTime('Entry')">Start</button>
+    <button onclick="logTime('Exit')">Stop</button>
+    <div class="log" id="logMessage"></div>
+  </div>
+
+  <script>
+    function logTime(type) {
+      const name = document.getElementById('username').value;
+      const equipment = document.getElementById('equipment').value;
+      const timestamp = new Date().toISOString();
+      const logMessage = document.getElementById('logMessage');
+
+      if (!name || !equipment) {
+        logMessage.textContent = 'Please select both name and equipment.';
+        logMessage.style.color = 'red';
+        return;
+      }
+
+      fetch('https://script.google.com/macros/s/AKfycbxj1fwnyk5uTf6pK9W8m9aTR6FJI2ThV8LthEtlElyv_fZ0JhJHdJNl4OFyZPMF9DUw/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, equipment, type, timestamp })
+      })
+      .then(response => response.json())
+      .then(data => {
+        logMessage.textContent = `${type} time logged at ${new Date().toLocaleTimeString()}`;
+        logMessage.style.color = 'green';
+      })
+      .catch(error => {
+        logMessage.textContent = 'Failed to log time.';
+        logMessage.style.color = 'red';
+        console.error(error);
+      });
+    }
+  </script>
+</body>
+</html>
